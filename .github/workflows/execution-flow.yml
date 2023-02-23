@@ -37,7 +37,11 @@ jobs:
         run: npm ci
       - name: Test code
         id: test-code
+        continue-on-error: true
         run: npm run test
+      - name: Output Information
+        # this will run even if tests failed
+        run: echo "Test phase is done"
       - name: Upload test report
         if: failure() && steps.test-code.outcome == 'failure'
         # works with failure() && ${{ steps.test-code.outcome == 'failure' }} as well
