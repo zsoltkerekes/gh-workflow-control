@@ -4,10 +4,23 @@ on:
 jobs:
   build:
 
+    continue-on-error: true
+
     strategy:
+      #all permutations
       matrix:
         worker: [ ubuntu-latest, windows-latest ]
-        node-version: [14, 16, 18]
+        node-version: [12, 14, 16]
+
+        # explicitly this and these values will not combine to all permutation, that is a plus to permutations
+        include:
+          - worker: ubuntu-latest
+            node-version: 18
+
+        #remove from generated matrix
+        exclude:
+            - worker: windows-latest
+              node-version: 12
 
     
     runs-on: ${{ matrix.worker }}
