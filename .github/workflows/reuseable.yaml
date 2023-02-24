@@ -4,17 +4,23 @@ on:
   workflow_call:
     inputs:
       artifact-id:
-        description: id of the artifact files
+        description: The id of the artifact files
         required: true
         type: string
         # default: dist-files
     secrets:
       some-secret:
         required: true
+    outputs:
+      result:
+        description: The result of the deployment job
+        value: ${{ jobs.deploy.outputs.outcome }}
     
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    outputs:
+      outcome: ${{ steps.set-result.outputs.step-result }}
     steps:
       - name: Output Information
         run: echo "Starting process..."
@@ -28,4 +34,6 @@ jobs:
         run: ls
       - name: Deploy
         run: echo "Deploying..."
-      
+      - name: Set Result output
+        id: set-result
+        run: echo "step-result=success" >> $GITHUB_OUTPUT

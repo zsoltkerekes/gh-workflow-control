@@ -50,8 +50,15 @@ jobs:
     secrets:
       some-secret: "testing this" # could be of course ${{ secrets.some-secret}}
 
+  output-deploy-result:
+    needs:  deploy-reuseable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Output Information
+        run: echo "Deploy was a ${{ needs.deploy-reuseable.outputs.result }}"
+
   report:
-    needs: [make-cache, build, deploy-reuseable]
+    needs: [make-cache, build, deploy-reuseable, output-deploy-result]
     runs-on: ubuntu-latest
     if: failure()
     steps:
