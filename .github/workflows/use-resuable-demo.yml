@@ -1,0 +1,66 @@
+name: Use Reusable for Website Deployment
+on:
+  #push:
+  #  branches:
+  #    - master
+  workflow_dispatch:
+jobs:
+  make-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v3
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependencies
+        run: npm ci
+
+  build:
+    needs: make-cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v3
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Build website
+        id: build-website
+        run: npm run build
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-files
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist-files
+      - name: Output contents
+        run: ls
+      - name: Deploy
+        uses: ./.github/workflows/reuseable.yaml
+
+  report:
+    needs: [make-cache, build, deploy]
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: output Information
+        run: |
+          echo "Something went wrong"
+          echo ${{ toJSON(github) }}
