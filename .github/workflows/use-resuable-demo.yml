@@ -42,23 +42,14 @@ jobs:
           name: dist-files
           path: dist
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: dist-files
-      - name: Output contents
-        run: ls
-
   deploy-reuseable:
     needs: deploy
     uses: ./.github/workflows/reuseable.yaml
+    with:
+      artifact-id: dist-files
 
   report:
-    needs: [make-cache, build, deploy]
+    needs: [make-cache, build, deploy-reuseable]
     runs-on: ubuntu-latest
     if: failure()
     steps:

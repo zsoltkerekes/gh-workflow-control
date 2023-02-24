@@ -2,11 +2,25 @@ name: Reuseable Workflow
 
 on:
   workflow_call:
+    inputs:
+      artifact-id:
+        description: id of the artifact files
+        required: true
+        type: string
+        # default: dist-files
     
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Output Information
+        run: echo "Starting process..."
+      - name: Get build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.artifact-id }}
+      - name: Output contents
+        run: ls
+      - name: Deploy
         run: echo "Deploying..."
       
