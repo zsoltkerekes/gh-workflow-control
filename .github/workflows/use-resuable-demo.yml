@@ -47,6 +47,8 @@ jobs:
     uses: ./.github/workflows/reuseable.yaml
     with:
       artifact-id: dist-files
+    secrets:
+      some-secret: "testing this" # could be of course ${{ secrets.some-secret}}
 
   report:
     needs: [make-cache, build, deploy-reuseable]
