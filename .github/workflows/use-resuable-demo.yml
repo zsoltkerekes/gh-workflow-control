@@ -1,4 +1,4 @@
-name: Use Reusable for Website Deployment
+name: Use Reusable Website Deployment
 on:
   #push:
   #  branches:
@@ -52,8 +52,10 @@ jobs:
           name: dist-files
       - name: Output contents
         run: ls
-      - name: Deploy
-        uses: ./.github/workflows/reuseable.yaml
+
+  deploy-reuseable:
+    needs: deploy
+    uses: ./.github/workflows/reuseable.yaml
 
   report:
     needs: [make-cache, build, deploy]
